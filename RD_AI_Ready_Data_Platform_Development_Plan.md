@@ -109,6 +109,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 1 — Shared conceptual, logical, and physical data models
 
+**Implementation status — complete.** Six cumulative tests passed. Fresh SQLite DDL, foreign-key targets, a complete curated join, rejected orphan references, and the schema-derived ERD were verified.
+
 **Deliverables:** A visible modeling studio and implemented relational database.
 
 - **Conceptual entities:** `ResearchProject`, `Experiment`, `Compound`, `Sample`, `Assay`, `AssayRun`, `AssayResult`, `SourceRecord`, and `Document`.
