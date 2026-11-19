@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Local development document
+RD_AI_Ready_Data_Platform_Development_Plan.md
+
 # Distribution / packaging
 .Python
 build/
