@@ -123,6 +123,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 2 — Reusable mappings, harmonization, and data quality
 
+**Implementation status — complete.** Seven cumulative tests passed. The two deterministic feeds contain 600 input rows, 584 curated results, and 16 quarantined rows. Replaying Alpha preserves those counts. Original values, approved conversions, and field assignments are available for review.
+
 **Deliverables:** Two source systems mapped into the same canonical schema.
 
 - Add a Beta mapping profile, keeping source-specific mappings separate from shared entity definitions.

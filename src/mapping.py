@@ -16,6 +16,8 @@ class Profile(BaseModel):
     source_system: str = Field(min_length=1)
     version: str = Field(min_length=1)
     fields: dict[str, str]
+    sample_column: str = 'SampleID'
+    result_column: str = 'ObservationID'
 
 
 def load_profile(name="alpha"):
