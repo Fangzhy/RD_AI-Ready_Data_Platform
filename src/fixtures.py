@@ -4,11 +4,10 @@ import io
 
 from src.mapping import load_profile
 
-ASSAYS = {
-    "AS-BIND": ("Binding", "nM", ("Binding", "Binding readout")),
-    "AS-ENZ": ("Enzyme activity", "%", ("Enzyme activity", "Activity readout")),
-    "AS-VIA": ("Viability", "%", ("Viability", "Cell viability")),
-}
+from src.taxonomy import CONCEPTS
+
+ASSAYS = {key: (c["term"], c["unit"], (c["aliases"]["Alpha"], c["aliases"]["Beta"]))
+          for key,c in CONCEPTS.items()}
 SYSTEMS = ("Alpha", "Beta")
 
 

@@ -152,6 +152,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 4 — Semantic modeling: taxonomy and ontology
 
+**Implementation status — complete.** Ten cumulative tests passed. Source-aware synonyms resolve to stable concepts and categories. Each typed graph edge carries provenance, and compound-to-assay-to-result paths reconcile with the curated SQL rows.
+
 **Deliverables:** A small, clearly scoped controlled vocabulary and knowledge graph.
 
 - Create an assay taxonomy (e.g., biochemical → enzyme activity / binding; cell-based → viability).

@@ -5,7 +5,7 @@ import hashlib
 import json
 import math
 
-from src.fixtures import ASSAYS
+from src.taxonomy import resolve
 from src.governance import now, start_run
 from src.mapping import check_mapping, read_csv, source_id
 
@@ -48,10 +48,12 @@ def assess(db, profile, row, duplicate, src):
         issues.append("Missing result ID")
     if duplicate or db.execute("SELECT 1 FROM assay_result WHERE result_id=? AND source_record_id<>?", (rid,src)).fetchone():
         issues.append("Duplicate result ID")
-    assay = next((key for key, (_, _, aliases) in ASSAYS.items() if fields["assay_name"] in aliases), None)
-    if not assay:
+    concept = resolve(fields["assay_name"], system)
+    assay = term = unit = None
+    if concept:
+        assay, term, unit = concept["id"], concept["term"], concept["unit"]
+    else:
         issues.append("Unknown assay term")
-    term, unit, _ = ASSAYS.get(assay, (None, None, ()))
     scale = UNIT_SCALE.get((fields["result_unit"], unit))
     if scale is None:
         issues.append("Missing or incompatible result unit")
