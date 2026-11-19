@@ -166,6 +166,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 5 — AI-ready explorer and API
 
+**Implementation status — complete.** Eleven cumulative tests passed. Cross-project SQL was repeatable, SQL previews were read-only, and the API returned the same identifiers and values as SQL with validated pagination. The explorer exports a session-specific SQLite snapshot for the API.
+
 **Deliverables:** Reusable SQL views, query explorer, and an optional small FastAPI service.
 
 - Build a read-only SQL explorer with curated sample queries and output previews.
