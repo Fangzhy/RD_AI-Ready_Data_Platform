@@ -1,0 +1,5 @@
+ExpNumber,MaterialID,TestName,ResultValue,ResultUnits
+A-E001,A-C01,Binding,14,nM
+A-E002,A-C02,Viability,78,%
+A-E003,A-C03,Binding,trace,nM
+A-E004,A-C04,Binding,21,
