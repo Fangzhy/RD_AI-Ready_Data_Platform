@@ -138,6 +138,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 3 — Metadata, lineage, and governance
 
+**Implementation status — complete.** Nine cumulative tests passed. All 584 curated origins resolve. Republishing a batch under a new version preserves both runs, their field audits and downstream impact. Reader visibility covers 18 current reports and reviewer visibility covers 24.
+
 **Deliverables:** Searchable lineage explorer and a lightweight governance model.
 
 - Capture `source_system`, `source_record_id`, `ingestion_run_id`, `mapping_version`, `transformation_id`, `quality_status`, `curated_record_id`, and timestamps.

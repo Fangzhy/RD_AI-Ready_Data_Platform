@@ -1,0 +1,37 @@
+import json
+
+import streamlit as st
+
+from src.database import records
+from src.governance import impact, trace, visible_documents
+from src.workspace import session_db
+
+
+def render():
+    db = session_db()
+    st.title("Metadata and lineage")
+    upstream, downstream, catalog = st.tabs(["Trace a record","Mapping impact","Catalog and access"])
+    with upstream:
+        key = st.text_input("Result or source record ID", "RES-Alpha-0001")
+        history = trace(db,key.strip())
+        if history:
+            for event in history:
+                st.subheader(f"{event['source_system']} · {event['quality_status']}")
+                st.json({k:v for k,v in event.items() if k not in ("audit_json","raw_json")})
+                st.json(json.loads(event["raw_json"]))
+                st.dataframe(json.loads(event["audit_json"]), hide_index=True)
+        else:
+            st.info("No lineage events match this identifier.")
+    with downstream:
+        profiles = records(db, "SELECT source_system,mapping_version FROM mapping_profile ORDER BY 1,2")
+        selected = st.selectbox("Published mapping", profiles, format_func=lambda p: " / ".join(p.values()))
+        rows, datasets = impact(db,selected["source_system"],selected["mapping_version"])
+        st.write("Dependent datasets and search indexes")
+        st.dataframe(datasets, hide_index=True)
+        st.write("Decisions made with this version")
+        st.dataframe(rows, hide_index=True)
+    with catalog:
+        st.dataframe(records(db,"SELECT * FROM dataset_catalog ORDER BY dataset"),hide_index=True)
+        role = st.selectbox("Demonstration access role", ["reader","reviewer"], key="lineage_role")
+        st.dataframe([{k:r[k] for k in ("document_id","version","title","access_class")}
+                      for r in visible_documents(db,role)], hide_index=True)

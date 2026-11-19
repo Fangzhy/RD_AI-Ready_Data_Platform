@@ -6,6 +6,7 @@ import json
 import math
 
 from src.fixtures import ASSAYS
+from src.governance import now, start_run
 from src.mapping import check_mapping, read_csv, source_id
 
 REVIEW = "Review the original row against the source registry and versioned mapping."
@@ -89,6 +90,7 @@ def ingest(db, profile, content):
     totals = Counter()
     with db:
         register_profile(db, profile)
+        run, transformation = start_run(db, profile, batch)
         sources = [(source_id(profile.source_system,batch,i,row),row) for i,row in enumerate(rows,1)]
         for src, _ in sources:
             db.execute("DELETE FROM assay_result WHERE source_record_id=?", (src,))
@@ -105,5 +107,9 @@ def ingest(db, profile, content):
                        (src,profile.source_system,profile.version,status,reason,json.dumps(audit)))
             if issues:
                 db.execute("INSERT INTO quarantine VALUES (?,?,?)", (src,reason,REVIEW))
+            result_id = None if issues else audit[-1]["canonical"]
+            db.execute("INSERT INTO lineage_event VALUES (?,?,?,?,?,?,?)",
+                       (run,src,transformation,status,result_id,reason,json.dumps(audit)))
             totals[status] += 1
+        db.execute("UPDATE dataset_catalog SET refreshed_at=? WHERE dataset='curated_results'", (now(),))
     return dict(totals)
