@@ -1,0 +1,86 @@
+[
+  {
+    "question": "What measurement was recorded in EXP-A001?",
+    "role": "reader",
+    "citation": "DOC-A001/v2/Measurement",
+    "value": "2 nM"
+  },
+  {
+    "question": "Show the reading for DOC-B002.",
+    "role": "reader",
+    "citation": "DOC-B002/v1/Measurement",
+    "value": "52 %"
+  },
+  {
+    "question": "What was the measurement for sample S-A003-2?",
+    "role": "reader",
+    "citation": "DOC-A003/v1/Measurement",
+    "value": "3 %"
+  },
+  {
+    "question": "Show the activity readout for C-015 in project Beta.",
+    "role": "reader",
+    "citation": "DOC-B005/v1/Measurement",
+    "value": "5 %"
+  },
+  {
+    "question": "What measurement was recorded for S-B006-1?",
+    "role": "reader",
+    "citation": "DOC-B006/v1/Measurement",
+    "value": "26 %"
+  },
+  {
+    "question": "What measurement was reported in DOC-A004?",
+    "role": "reviewer",
+    "citation": "DOC-A004/v1/Measurement",
+    "value": "59 %"
+  },
+  {
+    "question": "Find the result for RES-Beta-0015.",
+    "role": "reader",
+    "citation": "DOC-B003/v1/Measurement",
+    "value": "4 %"
+  },
+  {
+    "question": "What was the curated measurement for RES-Alpha-0002?",
+    "role": "reader",
+    "citation": "SQL/RES-Alpha-0002",
+    "value": "9 %"
+  },
+  {
+    "question": "Show the binding readout for C-001 in project Beta.",
+    "role": "reader",
+    "citation": "DOC-B001/v2/Measurement",
+    "value": "3 nM"
+  },
+  {
+    "question": "Find the recorded measurement in EXP-A011.",
+    "role": "reader",
+    "citation": "DOC-A011/v1/Measurement",
+    "value": "41 %"
+  },
+  {
+    "question": "What measurement is in DOC-A004?",
+    "role": "reader",
+    "citation": null,
+    "value": null
+  },
+  {
+    "question": "What measurement was recorded in EXP-Z999?",
+    "role": "reviewer",
+    "citation": null,
+    "value": null
+  },
+  {
+    "question": "What clinical dose follows from EXP-A001?",
+    "role": "reader",
+    "citation": null,
+    "value": null
+  },
+  {
+    "question": "What was the measurement for C-020 in EXP-B001?",
+    "role": "reader",
+    "citation": null,
+    "value": null
+  }
+]

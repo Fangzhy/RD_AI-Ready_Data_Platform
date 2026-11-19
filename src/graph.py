@@ -34,7 +34,8 @@ def build_graph(db, role="reader"):
         key = (doc["document_id"], doc["version"])
         for r in records(db,"""SELECT l.result_id FROM document_result l JOIN assay_result r
                           ON r.result_id=l.result_id AND r.source_record_id=l.source_record_id
-                          WHERE document_id=? AND version=?""",key):
+                          WHERE document_id=? AND version=?
+                          AND r.mapping_version=json_extract(l.measurement_json,'$.mapping_version')""",key):
             ref = f"{key[0]}/v{key[1]}"
             assertion(graph,r["result_id"],"reportedIn",ref,ref)
     return graph

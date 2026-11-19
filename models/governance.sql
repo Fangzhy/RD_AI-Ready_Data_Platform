@@ -38,6 +38,7 @@ INSERT INTO dataset_dependency VALUES ('curated_results','document_evidence'),('
 CREATE TABLE document_result (
     document_id TEXT NOT NULL, version INTEGER NOT NULL, result_id TEXT NOT NULL,
     source_record_id TEXT NOT NULL REFERENCES source_record,
+    measurement_json TEXT NOT NULL,
     PRIMARY KEY(document_id,version,result_id),
     FOREIGN KEY(document_id,version) REFERENCES document
 );

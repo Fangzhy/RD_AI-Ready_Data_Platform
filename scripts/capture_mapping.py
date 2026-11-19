@@ -1,4 +1,4 @@
-"""Capture the README image using the local app and an installed Edge browser."""
+"""Verify the walkthrough and capture the README images using the local app and an installed Edge browser."""
 import os
 import socket
 import subprocess
@@ -31,13 +31,30 @@ def main():
                     if attempt == 29:
                         raise
                     time.sleep(0.5)
-            if page.get_by_role("link", name="Schema mapping", exact=True).count():
-                page.get_by_role("link", name="Schema mapping", exact=True).click()
             page.get_by_role("heading", name="Schema mapping", exact=True).wait_for()
+            output = ROOT / "docs"
+            output.mkdir(exist_ok=True)
             page.get_by_text("Export mapping JSON", exact=True).wait_for()
-            output = ROOT / "docs/schema-mapping.png"
-            output.parent.mkdir(exist_ok=True)
-            page.screenshot(path=output)
+            page.screenshot(path=output/"schema-mapping.png")
+            page.get_by_role("button",name="Publish batch to the shared model").click()
+            page.get_by_text("Published Alpha batch.",exact=False).wait_for()
+            for label, heading in [
+                ("Overview","Research data overview"), ("Data modeling studio","Data modeling studio"),
+                ("Data quality","Data quality"), ("Metadata and lineage","Metadata and lineage"),
+                ("Taxonomy and ontology","Taxonomy and ontology"), ("AI-ready data explorer","AI-ready data explorer"),
+                ("RAG assistant","RAG assistant"),
+            ]:
+                page.get_by_role("link",name=label,exact=True).click()
+                page.get_by_role("heading",name=heading,exact=True).wait_for()
+                page.locator('[data-testid="stApp"][data-test-script-state="notRunning"]').wait_for()
+                if page.locator('[data-testid="stException"]').count():
+                    raise RuntimeError(f"{label} rendered a Streamlit exception")
+            page.get_by_role("link",name="DOC-A001/v2/Measurement",exact=True).wait_for()
+            page.screenshot(path=output/"rag-assistant.png")
+            page.get_by_role("tab",name="Retrieval evaluation").click()
+            page.get_by_role("button",name="Evaluate seeded demonstration").click()
+            page.get_by_role("tabpanel",name="Retrieval evaluation").locator('[data-testid="stDataFrame"]').first.wait_for()
+            print("Verified all eight pages, batch publication, evidence lookup and the evaluation dashboard.")
             browser.close()
     finally:
         server.terminate()

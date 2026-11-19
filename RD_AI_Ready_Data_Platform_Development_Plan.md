@@ -48,7 +48,7 @@ The application should demonstrate that you can:
 
 ## 3. Current starting point: schema-mapping app
 
-The existing `rd_schema_mapper/` implementation includes:
+The plan described the following baseline for `rd_schema_mapper/`. Phase 0 recreated it at the repository root when that directory was absent:
 
 - Streamlit CSV upload and synthetic sample source data.
 - Editable default source-to-target mappings:
@@ -180,6 +180,8 @@ See the repository README for root-level virtual environment, launch, and test c
 
 ### Phase 6 — RAG proof of value (optional after core MVP)
 
+**Implementation status — complete.** Fourteen automated tests passed, and headless Edge verified all eight pages, batch publication, evidence lookup, and the evaluation dashboard. On 14 labeled questions (10 answerable), baseline TF-IDF achieved Recall@5 6/10, citation correctness 6/6, and eight unanswered. Relationship-aware retrieval achieved 10/10, 10/10, and four unanswered. Both abstained on all four unsupported cases. These are deterministic retrieval and extractive citation scores. A separate live check using the configured dots-studio/dots-3-note-preview:free model returned the verified 2 nM quote from DOC-A001/v2/Measurement.
+
 **Deliverables:** A working document retrieval and evidence presentation page.
 
 - Generate synthetic scientific notes/reports tied to the structured records.
@@ -295,33 +297,33 @@ rd-ai-ready-platform/
 
 ### Must have (P0)
 
-- [ ] Extract reusable mapping and validation functions from current Streamlit code.
-- [ ] Add second source system and versioned mapping profile.
-- [ ] Define conceptual entities and their scientific definitions.
-- [ ] Create logical model with primary/foreign keys and cardinalities.
-- [ ] Implement physical SQL schema and curated result view.
-- [ ] Add referential integrity and controlled unit checks.
-- [ ] Save source IDs, mapping version, validation outcomes, and lineage.
-- [ ] Implement read-only cross-project SQL queries.
-- [ ] Write tests for common failure cases and repeat loads.
-- [ ] Build a repeatable 5–7 minute walkthrough.
+- [x] Extract reusable mapping and validation functions from current Streamlit code.
+- [x] Add second source system and versioned mapping profile.
+- [x] Define conceptual entities and their scientific definitions.
+- [x] Create logical model with primary/foreign keys and cardinalities.
+- [x] Implement physical SQL schema and curated result view.
+- [x] Add referential integrity and controlled unit checks.
+- [x] Save source IDs, mapping version, validation outcomes, and lineage.
+- [x] Implement read-only cross-project SQL queries.
+- [x] Write tests for common failure cases and repeat loads.
+- [x] Build a repeatable 5–7 minute walkthrough.
 
 ### Should have (P1)
 
-- [ ] Interactive ERD and entity inspector.
-- [ ] Source/target field-level mapping audit and impact analysis.
-- [ ] Taxonomy explorer with preferred terms and aliases.
-- [ ] Small provenance-aware scientific knowledge graph.
-- [ ] API endpoint or JSON export for a reusable entity.
-- [ ] Quality and readiness dashboard.
+- [x] Interactive ERD and entity inspector.
+- [x] Source/target field-level mapping audit and impact analysis.
+- [x] Taxonomy explorer with preferred terms and aliases.
+- [x] Small provenance-aware scientific knowledge graph.
+- [x] API endpoint or JSON export for a reusable entity.
+- [x] Quality and readiness dashboard.
 
 ### Could have (P2)
 
-- [ ] Baseline document search and metadata-aware search comparison.
+- [x] Baseline document search and metadata-aware search comparison.
 - [ ] Vector embeddings and a persistent search index.
-- [ ] Graph-assisted retrieval for multi-hop scientific questions.
-- [ ] LLM answer generation with explicit source citations.
-- [ ] Retrieval evaluation dashboard with labeled test cases.
+- [x] Graph-assisted retrieval for multi-hop scientific questions.
+- [x] LLM answer generation with explicit source citations.
+- [x] Retrieval evaluation dashboard with labeled test cases.
 
 ---
 
@@ -384,17 +386,6 @@ Use deterministic fixtures and unit tests; do not claim that this demo constitut
 
 ---
 
-## 12. Recommended next coding milestone
+## 12. Implemented milestone
 
-**Next task:** Implement **Phase 1 shared data modeling** on top of the existing `rd_schema_mapper` application.
-
-Deliver, in this order:
-
-1. `physical_schema.sql` with Experiment, Compound, Sample, Assay, and AssayResult entities.
-2. A deterministic generator for a second source system with renamed columns.
-3. Two JSON mapping profiles producing the same canonical fields.
-4. A Streamlit page displaying conceptual, logical, and physical views.
-5. A single SQL query returning validated assay results from both projects.
-6. Tests for referential integrity and mapping consistency.
-
-**Milestone completion criterion:** Demonstrate that one standardized data model supports two independently formatted R&D sources and produces a single traceable, queryable dataset.
+The two independently formatted feeds now produce one traceable, queryable dataset. Use the README walkthrough to exercise the eight Streamlit pages, published API, and cited RAG lookup. Each phase above records its verification. The optional persistent embedding index remains outside this implementation.

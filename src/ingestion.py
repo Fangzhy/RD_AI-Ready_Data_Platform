@@ -35,48 +35,72 @@ def assess(db, profile, row, duplicate, src):
     eid = lookup(db, "experiment", system, fields["experiment_id"])
     cid = lookup(db, "compound", system, fields["compound_id"])
     issues = []
+    field_issues = {}
+
+    def flag(target, reason):
+        issues.append(reason)
+        field_issues.setdefault(target, []).append(reason)
     for field, value in [("sample", sid), ("experiment", eid), ("compound", cid)]:
         if value is None:
-            issues.append(f"Unknown or missing {field} ID")
+            flag(f"{field}_id", f"Unknown or missing {field} ID")
     if sid and cid and eid and not db.execute(
         "SELECT 1 FROM sample WHERE sample_id=? AND compound_id=? AND experiment_id=?", (sid,cid,eid)
     ).fetchone():
-        issues.append("Sample has a different registered compound or experiment")
+        flag("sample_id", "Sample has a different registered compound or experiment")
     local_id = row[profile.result_column].strip()
     rid = f"RES-{system}-{local_id}"
     if not local_id:
-        issues.append("Missing result ID")
+        flag("result_id", "Missing result ID")
     if duplicate or db.execute("SELECT 1 FROM assay_result WHERE result_id=? AND source_record_id<>?", (rid,src)).fetchone():
-        issues.append("Duplicate result ID")
+        flag("result_id", "Duplicate result ID")
     concept = resolve(fields["assay_name"], system)
     assay = term = unit = None
     if concept:
         assay, term, unit = concept["id"], concept["term"], concept["unit"]
     else:
-        issues.append("Unknown assay term")
+        flag("assay_name", "Unknown assay term")
     scale = UNIT_SCALE.get((fields["result_unit"], unit))
     if scale is None:
-        issues.append("Missing or incompatible result unit")
+        flag("result_unit", "Missing or incompatible result unit")
     number = None
     try:
-        number = float(Decimal(fields["result_value"]) * (scale or 1))
-        if not math.isfinite(number) or number < 0:
+        decimal_value = Decimal(fields["result_value"])
+        if not decimal_value.is_finite() or decimal_value < 0:
+            raise ValueError
+        number = float(decimal_value * (scale or 1))
+        if not math.isfinite(number) or (decimal_value and number == 0):
             raise ValueError
     except (InvalidOperation, ArithmeticError, ValueError):
-        issues.append("Expected a finite nonnegative result")
+        number = None
+        flag("result_value", "Expected a finite nonnegative result")
     corrected = bool((scale and scale != 1) or (term and term != fields["assay_name"]))
     values = dict(experiment_id=eid, compound_id=cid, sample_id=sid, assay_name=term,
                   result_value=number if number is not None and math.isfinite(number) else None,
                   result_unit=unit if scale else None, result_id=rid)
+    source_fields = {target:source for source,target in profile.fields.items()}
     assignments = {**profile.fields, profile.sample_column: "sample_id", profile.result_column: "result_id"}
-    audit = [{"source": col, "target": target, "raw": row[col], "canonical": values[target]}
-             for col, target in assignments.items()]
+    audit = []
+    for col, target in assignments.items():
+        reasons = field_issues.get(target, [])
+        canonical = values[target]
+        if reasons:
+            operation = "rejected"
+        elif target == "result_value":
+            operation = "unit conversion" if scale != 1 else "numeric parse"
+        elif target in ("compound_id","experiment_id","sample_id","result_id"):
+            operation = "identifier mapping"
+        elif str(canonical) != row[col]:
+            operation = "normalized"
+        else:
+            operation = "copied"
+        audit.append(dict(source=col,target=target,raw=row[col],canonical=canonical,
+                          operation=operation,reasons=reasons))
     if not issues:
         run = f"RUN-{eid}-{assay}"
         db.execute("INSERT OR IGNORE INTO assay_run VALUES (?,?,?)", (run,eid,assay))
         db.execute("INSERT INTO assay_result VALUES (?,?,?,?,?,?,?,?,?,?)",
-                   (rid,eid,sid,run,number,unit,row[next(k for k,v in profile.fields.items() if v=='result_value')],
-                    row[next(k for k,v in profile.fields.items() if v=='result_unit')],src,profile.version))
+                   (rid,eid,sid,run,number,unit,row[source_fields["result_value"]],
+                    row[source_fields["result_unit"]],src,profile.version))
     return ("rejected" if issues else "corrected" if corrected else "accepted"), issues, audit
 
 

@@ -12,14 +12,17 @@ def render():
     st.title("Metadata and lineage")
     upstream, downstream, catalog = st.tabs(["Trace a record","Mapping impact","Catalog and access"])
     with upstream:
-        key = st.text_input("Result or source record ID", "RES-Alpha-0001")
+        key = st.text_input("Result or source record ID", st.query_params.get("record", "RES-Alpha-0001"))
         history = trace(db,key.strip())
         if history:
             for event in history:
                 st.subheader(f"{event['source_system']} · {event['quality_status']}")
                 st.json({k:v for k,v in event.items() if k not in ("audit_json","raw_json")})
                 st.json(json.loads(event["raw_json"]))
-                st.dataframe(json.loads(event["audit_json"]), hide_index=True)
+                audit = json.loads(event["audit_json"])
+                for field in audit:
+                    field["canonical"] = "" if field["canonical"] is None else str(field["canonical"])
+                st.dataframe(audit, hide_index=True)
         else:
             st.info("No lineage events match this identifier.")
     with downstream:
