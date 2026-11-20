@@ -30,7 +30,7 @@ def generate(question, candidates):
     if not candidates:
         raise GenerationError("No supported evidence to send.")
     key, models = configuration()
-    evidence = [{"citation":e.citation,"quote":e.text} for e in candidates]
+    evidence = [{"citation":e.source_citation,"quote":e.text} for e in candidates]
     payload = {"question":question,"evidence":evidence}
     system = ("Answer the lookup using the evidence supplied. Copy one complete supporting quote and its "
               "citation exactly into a JSON object with keys quote and citation. If unsupported, return {}. "

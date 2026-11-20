@@ -1,5 +1,5 @@
-ExpNumber,MaterialID,TestName,ResultValue,ResultUnits
-A-E001,A-C01,Binding,14,nM
-A-E002,A-C02,Viability,78,%
-A-E003,A-C03,Binding,trace,nM
-A-E004,A-C04,Binding,21,
+ExpNumber,MaterialID,TestName,ResultValue,ResultUnits,SampleID,ObservationID
+A-E001,A-C01,Binding,14,nM,A-001/1,UPLOAD-01
+A-E002,A-C04,Binding,0.078,uM,A-002/1,UPLOAD-02
+A-E003,A-C07,Binding,trace,nM,A-003/1,UPLOAD-03
+A-E004,A-C10,Binding,21,,A-004/1,UPLOAD-04

@@ -3,19 +3,24 @@ import sqlite3
 import pytest
 
 from src.exports import snapshot
-from src.mapping import ROOT, Profile, check_mapping, load_profile, read_csv
-from src.validation import preview
+from src.mapping import ROOT, Profile, check_mapping, load_profile
+from src.validation import review
+from src.workspace import build
 
 
 def test_roundtrip_and_failures():
     profile = load_profile()
     assert Profile.model_validate_json(profile.model_dump_json()) == profile
-    columns, rows = read_csv((ROOT / "data/synthetic_raw/alpha.csv").read_bytes())
-    valid, failed = preview(profile, columns, rows, "fixture")
-    assert len(valid) == len(failed) == 2
-    assert "nonnegative" in failed[0]["reasons"]
-    assert "Missing result_unit" in failed[1]["reasons"]
-    assert preview(profile, columns, rows, "fixture") == (valid, failed)
+    workspace = build()
+    content = (ROOT / "data/synthetic_raw/alpha.csv").read_bytes()
+    batch = review(workspace, profile, content)
+    assert [d.status for d in batch.decisions] == ["accepted", "corrected", "rejected", "rejected"]
+    assert "nonnegative" in batch.decisions[2].reason
+    assert "unit" in batch.decisions[3].reason
+    assert review(workspace, profile, content) == batch
+    valid = [d.summary(profile.version) for d in batch.decisions if d.status != "rejected"]
+    failed = [d.summary(profile.version) for d in batch.decisions if d.status == "rejected"]
+    workspace.close()
     db = sqlite3.connect(":memory:")
     db.deserialize(snapshot(valid, failed))
     assert db.execute("SELECT count(*) FROM curated_results").fetchone() == (2,)

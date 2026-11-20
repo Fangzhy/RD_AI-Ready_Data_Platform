@@ -12,8 +12,22 @@ def render():
     st.title("Metadata and lineage")
     upstream, downstream, catalog = st.tabs(["Trace a record","Mapping impact","Catalog and access"])
     with upstream:
-        key = st.text_input("Result or source record ID", st.query_params.get("record", "RES-Alpha-0001"))
-        history = trace(db,key.strip())
+        origin = st.session_state.pop("cited_origin", None)
+        if origin:
+            st.session_state["trace_input"] = origin[0]
+        elif "trace_input" not in st.session_state:
+            st.session_state["trace_input"] = st.query_params.get("record", "RES-Alpha-0001")
+        key = st.text_input("Result or source record ID", key="trace_input").strip()
+        history = trace(db, key)
+        versions = sorted({event["mapping_version"] for event in history})
+        version_key = f"trace-version-{key}"
+        requested = origin[1] if origin else st.query_params.get("mapping_version")
+        if requested in versions and (origin or version_key not in st.session_state):
+            st.session_state[version_key] = requested
+        version = st.selectbox("Trace mapping version", [None, *versions],
+                               format_func=lambda v: v or "All versions", key=version_key)
+        if version:
+            history = [event for event in history if event["mapping_version"] == version]
         if history:
             for event in history:
                 st.subheader(f"{event['source_system']} · {event['quality_status']}")

@@ -15,9 +15,11 @@ py -3.12 -m venv .venv
 
 ## Mapping workflow
 
-Open Schema mapping, inspect the Alpha fixture or upload a UTF-8 CSV, and assign a source column to each required target. Import or export a versioned JSON profile to reuse the assignments. Review accepted and flagged rows before downloading a CSV or SQLite snapshot. A source row's identifier incorporates its source, input batch, position, and original content. The mapping preview checks units and numeric values and preserves the original CSV.
+Open Schema mapping, inspect the Alpha fixture or upload a UTF-8 CSV, and assign a source column to each required target. Import or export a versioned JSON profile to reuse the assignments. Review accepted and flagged rows before downloading a CSV or SQLite snapshot. A source row's identifier incorporates its source, input batch, position, and original content. Preview and publication apply the same registry, uniqueness, numeric, assay, and unit checks. Each data row shows its canonical values, decision, and reason. The same decision is available in Data quality and lineage.
 
 ![Schema mapping with the Alpha fixture](docs/schema-mapping.png)
+
+To try an upload, choose Alpha and upload [the four-row example](data/synthetic_raw/alpha.csv). It produces one accepted row, one corrected row, and two rejections. Publish it and choose **Find this batch in RAG**. In **RAG assistant → Structured records**, combine source, batch, canonical experiment ID, and result ID filters. For `RES-Alpha-UPLOAD-02`, the generated context shows 78 nM. The original CSV row shows 0.078 uM. Open its cited lineage to inspect the field audit for the mapping version used. Uploaded data lives in the current browser session.
 
 ## SQL and JSON API
 
@@ -26,7 +28,7 @@ Run `.\.venv\Scripts\python.exe -m uvicorn src.api:app` and open `http://127.0.0
 ## Five-minute walkthrough
 
 1. **Overview and Schema mapping** (1 minute). Compare Alpha and Beta source columns, open their versioned assignments, and publish one feed again. The overview shows 600 immutable rows across the two projects.
-2. **Data modeling studio** (45 seconds). Inspect the assay result entity, its links to runs and samples, and the SQLite constraints behind the diagram.
+2. **Data modeling studio** (45 seconds). Select a scientific requirement to see its field definition, relationship, quality rule, and design decision. Inspect the matching SQLite entity below the diagram.
 3. **Data quality** (45 seconds). Compare 584 curated results with 16 quarantined rows. Inspect the original input and reason for a duplicate ID, missing unit, or unknown reference.
 4. **AI-ready data explorer** (45 seconds). Run the cross-project query, then inspect original and converted values. The JSON export and API share the SQL identifiers.
 5. **Metadata and lineage** (45 seconds). Trace `RES-Alpha-0001` to its source row, transformation and run. Select Alpha version 1.0 to see affected records and downstream datasets.

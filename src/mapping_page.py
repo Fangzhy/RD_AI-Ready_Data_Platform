@@ -1,5 +1,4 @@
 import csv
-import hashlib
 
 import pandas as pd
 import streamlit as st
@@ -9,7 +8,7 @@ from src.fixtures import SYSTEMS, feed
 from src.workspace import session_db
 from src.ingestion import ingest
 from src.mapping import TARGETS, Profile, load_profile, read_csv
-from src.validation import preview
+from src.validation import review
 
 
 def render():
@@ -41,28 +40,38 @@ def render():
                                     key=f"{profile.model_dump_json()}-{column}")
             if selected != "(skip)":
                 fields[column] = selected
-    batch = hashlib.sha256(content).hexdigest()
+    db = session_db()
     try:
         active = Profile(**{**profile.model_dump(), 'version': version, 'fields': fields})
-        accepted, flagged = preview(active, columns, rows, batch)
+        batch = review(db, active, content)
     except ValueError as error:
         st.error(str(error))
         return
     st.download_button("Download source CSV", content, f"{system}.csv")
     if st.button("Publish batch to the shared model", type="primary"):
         try:
-            outcome = ingest(session_db(), active, content)
+            outcome = ingest(db, active, content)
+            st.session_state.last_publication = (system, batch.batch_id)
             st.success(f"Published {system} batch. Decisions: {outcome}")
         except ValueError as error:
             st.error(str(error))
-    st.caption("The preview below checks mapped values. Publication also validates registered IDs, duplicates, assay terms and compatible units.")
+    if st.session_state.get("last_publication") == (system, batch.batch_id):
+        st.code(batch.batch_id, language=None)
+        if st.button("Find this batch in RAG"):
+            from src import rag_page
+            st.session_state["open_batch"] = (system, batch.batch_id)
+            st.switch_page(st.Page(rag_page.render, title="RAG assistant", url_path="assistant"))
     st.download_button("Export mapping JSON", active.model_dump_json(indent=2), "mapping.json")
-    for label, records, names in [("Accepted", accepted, OUTPUT_COLUMNS),
-                                  ("Flagged", flagged, OUTPUT_COLUMNS + ["reasons"])]:
-        frame = pd.DataFrame(records, columns=names)
-        st.subheader(f"{label} · {len(records)}")
-        st.dataframe(frame, hide_index=True)
-        st.download_button(f"Download {label.lower()} CSV", frame.to_csv(index=False), f"{label}.csv")
+    decisions = [d.summary(active.version) for d in batch.decisions]
+    frame = pd.DataFrame(decisions, columns=OUTPUT_COLUMNS)
+    st.subheader("Row decisions")
+    st.caption("Preview uses the publication rules and current registry. Row numbers count data records starting at 1.")
+    st.dataframe(frame, hide_index=True)
+    accepted = [r for r in decisions if r["quality_status"] != "rejected"]
+    flagged = [r for r in decisions if r["quality_status"] == "rejected"]
+    for label, records in [("Accepted", accepted), ("Flagged", flagged)]:
+        subset = pd.DataFrame(records, columns=OUTPUT_COLUMNS)
+        st.download_button(f"Download {label.lower()} CSV", subset.to_csv(index=False), f"{label}.csv")
     with st.expander("Transformation and database exports"):
         st.code(pandas_code(active), language="python")
         st.code(VIEW_SQL, language="sql")

@@ -4,7 +4,8 @@ import pandas as pd
 
 from src.mapping import TARGETS
 
-OUTPUT_COLUMNS = [*TARGETS, "source_record_id", "mapping_version"]
+OUTPUT_COLUMNS = ["row_number", "quality_status", "reasons", "result_id", "sample_id", *TARGETS,
+                  "assay_id", "source_record_id", "mapping_version"]
 VIEW_SQL = "CREATE VIEW curated_results AS SELECT * FROM accepted_results"
 
 
@@ -13,7 +14,7 @@ def snapshot(accepted, flagged):
     try:
         for table, rows, columns in [
             ("accepted_results", accepted, OUTPUT_COLUMNS),
-            ("flagged_results", flagged, OUTPUT_COLUMNS + ["reasons"]),
+            ("flagged_results", flagged, OUTPUT_COLUMNS),
         ]:
             pd.DataFrame(rows, columns=columns).to_sql(table, db, index=False)
         db.execute(VIEW_SQL)
