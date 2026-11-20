@@ -1,0 +1,13 @@
+{
+  "source_system": "Beta",
+  "version": "1.0",
+  "sample_column": "SampleCode",
+  "result_column": "ReadingCode",
+  "fields": {
+    "ExperimentCode": "experiment_id",
+    "CompoundCode": "compound_id",
+    "MethodLabel": "assay_name",
+    "Reading": "result_value",
+    "UnitCode": "result_unit"
+  }
+}

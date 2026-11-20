@@ -1,0 +1,11 @@
+{
+  "source_system": "Alpha",
+  "version": "1.0",
+  "fields": {
+    "ExpNumber": "experiment_id",
+    "MaterialID": "compound_id",
+    "TestName": "assay_name",
+    "ResultValue": "result_value",
+    "ResultUnits": "result_unit"
+  }
+}

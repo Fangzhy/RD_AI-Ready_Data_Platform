@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "categories": {"CAT-BIO": "Biochemical", "CAT-CELL": "Cell-based"},
+  "assays": [
+    {"id":"AS-BIND","term":"Binding","category":"CAT-BIO","unit":"nM","target":"T-01","aliases":{"Alpha":"Binding","Beta":"Binding readout"}},
+    {"id":"AS-ENZ","term":"Enzyme activity","category":"CAT-BIO","unit":"%","target":"T-02","aliases":{"Alpha":"Enzyme activity","Beta":"Activity readout"}},
+    {"id":"AS-VIA","term":"Viability","category":"CAT-CELL","unit":"%","target":"T-03","aliases":{"Alpha":"Viability","Beta":"Cell viability"}}
+  ]
+}
