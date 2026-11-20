@@ -1,5 +1,7 @@
 # R&D AI-Ready Data Platform
 
+[Launch live demo](https://pharma-data-ai-ready.streamlit.app/overview)
+
 An interactive Streamlit demo for mapping synthetic screening results into a shared research schema. All example identifiers and measurements are fictional. The quality rules apply to these fixtures. This prototype has no GxP validation.
 
 ## Run locally
